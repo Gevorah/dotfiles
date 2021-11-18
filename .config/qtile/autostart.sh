@@ -1,3 +1,3 @@
 #!/bin/sh
 picom --experimental-backends &
-dunst
+dunst &

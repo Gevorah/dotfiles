@@ -2,7 +2,8 @@ from libqtile.config import Key, Group
 from libqtile.command import lazy
 from .keys import modm, keys
 
-workspaces = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+workspaces = ['1','2','3','4','5','6','7','8','9']
+#[' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
 
 groups = [Group(w) for w in workspaces]
 

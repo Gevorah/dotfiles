@@ -9,13 +9,11 @@ config = {
 
 floating_layout = layout.Floating(
     float_rules=[
-        *layout.default_float_rules,
-
+        *layout.Floating.default_float_rules
     ]
 )
 
 layouts = [
-    laout.Floating()
     layout.Bsp(**config),
     #layout.Columns(),
     #layout.Matrix(columns=2,**config),
