@@ -88,30 +88,27 @@ addNETSupported x = withDisplay $ \dpy -> do
 --sidebar_control = spawn "exec ~/.config/eww/sidebar_control"
 --maimcopy = spawn "maim -s | xclip -selection clipboard -t image/png && notify-send \"Screenshot\" \"Copied to Clipboard\" -i flameshot"
 --maimsave = spawn "maim -s ~/Desktop/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Desktop\" -i flameshot"
---rofi_launcher = spawn "rofi -no-lazy-grab -show drun -modi run,drun,window -theme $HOME/.config/rofi/launcher/style -drun-icon-theme \"Papirus\" "
+rofi_launcher = spawn "rofi -no-lazy-grab -show drun -modi run,drun,window -theme $HOME/.config/rofi/gruvbox-dark-hard -drun-icon-theme \"Papirus\" "
 
 myKeys :: [(String, X ())]
 myKeys =
     [
-    -- toggle screens
+    -- Toggle screens
     ("M-<Rigth>", nextScreen)
     , ("M-<Left>", prevScreen)
 
-    -- toggle window no borders
+    -- Toggle window no borders
     , ("M-g", withFocused toggleBorder)
     
-    -- MultiToggle
+    -- Multitoggle
     , ("M-S-<Tab>", sendMessage (MT.Toggle NBFULL) >> sendMessage ToggleStruts)
     , ("M-S-n", sendMessage $ MT.Toggle NOBORDERS)
 
-    -- launch a terminal
+    -- Launch a terminal
     , ("M-S-<Return>", spawn myTerminal)
 
-    -- lock screen
-    --((modm,               xK_F1    ), spawn "betterlockscreen -l")
-
-    -- launch rofi and dashboard
-    --, ("M-o", rofi_launcher)
+    -- Launch rofi and dashboard
+    , ("M-o", rofi_launcher)
     --, ("M-p", center_control)
     --("M-s", sidebar_control)
 
@@ -128,15 +125,10 @@ myKeys =
     , ("<xF86XK_MonBrightnessDown>", spawn "brightnessctl s 10-%")
  
     -- Screenshot
-    --((0,                  xK_Print), maimcopy)
-    --((modm,               xK_Print), maimsave)
+    --("<Print>", maimcopy)
+    --("M-<Print>", maimsave)
 
-    -- My Stuff
-    --, ((modm,               xK_b     ), spawn "exec ~/bin/bartoggle")
-    --, ((modm,               xK_z     ), spawn "exec ~/bin/inhibit_activate")
-    --, ((modm .|. shiftMask, xK_z     ), spawn "exec ~/bin/inhibit_deactivate")
-
-    -- close focused window
+    -- Close focused window
     , ("M-S-c", kill)
 
     -- Gaps
@@ -155,7 +147,7 @@ myKeys =
     , ("M-C-i", sendMessage $ IncGap 10 R) -- increment the right-hand gap
     , ("M-S-i", sendMessage $ DecGap 10 R) -- decrement the right-hand gap
 
-     -- Rotate through the available layout algorithms
+     -- Rotate through the available layouts
     , ("M-<Space>", sendMessage NextLayout)
 
     --  Reset the layouts on the current workspace to default
@@ -192,7 +184,7 @@ myKeys =
     , ("M-l", sendMessage MirrorExpand)
 
     -- Toggle float window
-    --, ((modm .|. shiftMask, xK_t     ), sendMessage (T.Toggle simplestFloat))
+    --, ("M-S-t", sendMessage (T.Toggle simplestFloat))
 
     -- Push window back into tiling
     , ("M-t", withFocused $ windows . W.sink)
@@ -307,10 +299,7 @@ myFadeHook = composeAll [                 opaque
 -- By default, do nothing.
 myStartupHook = do
     spawnOnce "polybar --config=~/.config/polybar/config.ini main"
-    --spawnOnce "exec ~/bin/bartoggle"
     --spawnOnce "exec ~/bin/eww daemon"
-    --spawn "xsetroot -cursor_name left_ptr"
-    --spawn "exec ~/bin/lock.sh"
     spawnOnce "feh --bg-scale ~/Pictures/Wallpapers/solo-level.png"
     --spawnOnce "picom --experimental-backends"
     spawnOnce "greenclip daemon"
@@ -325,7 +314,7 @@ main = xmonad
     $ ewmh 
     $ def
     {
-        -- simple stuff
+        -- Simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
         clickJustFocuses   = myClickJustFocuses,
@@ -335,7 +324,7 @@ main = xmonad
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,
 
-        -- hooks
+        -- Hooks
         manageHook         = insertPosition Below Newer <+> myManageHook, 
         layoutHook         = spacingRaw False (Border 10 10 10 10) True (Border 10 10 10 10) True $ myLayout,
         handleEventHook    = myEventHook,

@@ -3,9 +3,8 @@ env:
 
 window:
   padding:
-    x: 25
-    y: 25
-
+    x: 16
+    y: 16
     dynamic_padding:  true
     decoration: none
 
@@ -86,12 +85,11 @@ schemes:
 
 colors: *gruvbox
 
-background_opacity: 1
+window_opacity: 0.6
 
-# cursor:
-#   style: Underline
-
-#   unfocused_hollow: false
+cursor:
+  style: Block
+  unfocused_hollow: true
 
 live_config_reload: true
                  
