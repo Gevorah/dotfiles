@@ -3,25 +3,25 @@ env:
 
 window:
   padding:
-    x: 16
-    y: 16
+    x: 10
+    y: 10
     dynamic_padding:  true
     decoration: none
 
 font:
   normal:
-    family: UbuntuMono Nerd Font Regular
+    family: UbuntuMono Nerd Font
 
   bold:
-    family: UbuntuMono Nerd Font Bold
+    family: UbuntuMono Nerd Font
 
   italic:
-    family: UbuntuMono Nerd Font Italic
+    family: UbuntuMono Nerd Font
 
   bold_italic:
-    family: UbuntuMono Nerd Font Bold Italic
+    family: UbuntuMono Nerd Font
 
-  size: 9
+  size: 10
 
 schemes:
   gruvbox: &gruvbox
@@ -85,7 +85,7 @@ schemes:
 
 colors: *gruvbox
 
-window_opacity: 0.6
+window_opacity: 1
 
 cursor:
   style: Block

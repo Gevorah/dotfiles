@@ -63,8 +63,8 @@ myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 -- ["www", "dev", "term", "ref", "git", "dock", "fs", "media", "misc"]
 -- [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 
-myNormalBorderColor = "#3b4252" :: String
-myFocusedBorderColor = "#bc96da" :: String
+myNormalBorderColor = "#282828" :: String
+myFocusedBorderColor = "#d65d0e" :: String
 
 addEWMHFullscreen :: X ()
 addEWMHFullscreen = do
@@ -113,16 +113,16 @@ myKeys =
     --("M-s", sidebar_control)
 
     -- Audio keys
-    , ("<xF86XK_AudioPlay>", spawn "playerctl play-pause")
-    , ("<xF86XK_AudioPrev>", spawn "playerctl previous")
-    , ("<xF86XK_AudioNext>", spawn "playerctl next")
-    , ("<xF86XK_AudioRaiseVolume>", spawn "pactl set-sink-volume 0 +5%")
-    , ("<xF86XK_AudioLowerVolume>", spawn "pactl set-sink-volume 0 -5%")
-    , ("<xF86XK_AudioMute>", spawn "pactl set-sink-mute 0 toggle")
+    , ("<XF86AudioPlay>", spawn "playerctl play-pause")
+    , ("<XF86AudioPrev>", spawn "playerctl previous")
+    , ("<XF86AudioNext>", spawn "playerctl next")
+    , ("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume 0 +5%")
+    , ("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume 0 -5%")
+    , ("<XF86AudioMute>", spawn "pactl set-sink-mute 0 toggle")
 
     -- Brightness keys
-    , ("<xF86XK_MonBrightnessUp>", spawn "brightnessctl s +10%")
-    , ("<xF86XK_MonBrightnessDown>", spawn "brightnessctl s 10-%")
+    , ("<XF86MonBrightnessUp>", spawn "brightnessctl s +10%")
+    , ("<XF86MonBrightnessDown>", spawn "brightnessctl s 10-%")
  
     -- Screenshot
     --("<Print>", maimcopy)
@@ -301,7 +301,7 @@ myStartupHook = do
     spawnOnce "polybar --config=~/.config/polybar/config.ini main"
     --spawnOnce "exec ~/bin/eww daemon"
     spawnOnce "feh --bg-scale ~/Pictures/Wallpapers/solo-level.png"
-    --spawnOnce "picom --experimental-backends"
+    spawnOnce "picom --experimental-backends"
     spawnOnce "greenclip daemon"
     spawnOnce "dunst"
     setWMName "LG3D"
@@ -326,7 +326,7 @@ main = xmonad
 
         -- Hooks
         manageHook         = insertPosition Below Newer <+> myManageHook, 
-        layoutHook         = spacingRaw False (Border 10 10 10 10) True (Border 10 10 10 10) True $ myLayout,
+        layoutHook         = spacingRaw False (Border 6 6 6 6) True (Border 6 6 6 6) True $ myLayout,
         handleEventHook    = myEventHook,
         logHook            = myLogHook >> workspaceHistoryHook,
         startupHook        = myStartupHook >> addEWMHFullscreen

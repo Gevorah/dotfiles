@@ -118,9 +118,9 @@ makepkg -si
 ```
 
 ---------------------------------------------------------------------------------
-# Qtile
+# Desktop Environment
 ```sh
-sudo pacman -Syu xorg xorg-server xorg-xinit qtile lightdm lightdm-webkit2-greeter networkmanager nm-connection-editor network-manager-applet alacrity 
+sudo pacman -Syu xorg xorg-server xorg-xinit lightdm lightdm-webkit2-greeter networkmanager nm-connection-editor network-manager-applet alacritty 
 systemctl enable lightdm
 ```
 
@@ -194,7 +194,7 @@ Edit `~/.gtkrc-2.0`
 ```sh
 gtk-cursor-theme-name = "capitaine-cursors"
 ```
-Again, edit `~/.config/gtk-3.0/settings.ini` and/or `~/.config/gtk-4.0/settings.ini`
+Again, edit `~/.config/gtk-3.0/settings.ini` or `~/.config/gtk-4.0/settings.ini`
 ```sh
 [Settings]
 gtk-cursor-theme-name = capitaine-cursors
@@ -299,3 +299,4 @@ mount /dev/<root> /mnt/
 mount /dev/<boot> /mnt/efi
 grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
+
