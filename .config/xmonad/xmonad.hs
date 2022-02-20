@@ -5,36 +5,39 @@ import qualified XMonad.StackSet as W
 
 -- Actions
 import qualified XMonad.Actions.ConstrainedResize as Sqr
-import XMonad.Actions.CopyWindow
+import XMonad.Actions.CopyWindow (kill1)
 import XMonad.Actions.CycleWS
 import XMonad.Actions.MouseResize
 import XMonad.Actions.NoBorders
 import XMonad.Actions.TiledWindowDragging
+import XMonad.Actions.WithAll (killAll)
 
 -- Hooks
 import XMonad.Hooks.EwmhDesktops (ewmh)
 import XMonad.Hooks.InsertPosition
 import XMonad.Hooks.FadeWindows
-import XMonad.Hooks.ManageHelpers (doFullFloat, isFullscreen)
+import XMonad.Hooks.ManageHelpers (doFullFloat, doCenterFloat, isFullscreen)
 import XMonad.Hooks.ManageDocks (ToggleStruts (..), avoidStruts, docks, manageDocks, Direction2D(D, L, R, U))
 import XMonad.Hooks.SetWMName
 import XMonad.Hooks.WorkspaceHistory (workspaceHistoryHook)
 
 -- Layouts
-import XMonad.Layout.Circle
+import XMonad.Layout.GridVariants (Grid(Grid))
+import XMonad.Layout.ResizableTile
+import XMonad.Layout.Spiral
+
+-- Layouts Modifiers
 import XMonad.Layout.DraggingVisualizer
 import XMonad.Layout.Fullscreen (fullscreenEventHook, fullscreenManageHook, fullscreenSupport, fullscreenFull)
-import XMonad.Layout.Gaps
-    (Direction2D(D, L, R, U),
-    gaps,
-    setGaps,
-    GapMessage(DecGap, ToggleGaps, IncGap))
+import XMonad.Layout.LayoutModifier
+import XMonad.Layout.LimitWindows (limitWindows, increaseLimit, decreaseLimit)
+import XMonad.Layout.Magnifier
 import XMonad.Layout.MultiToggle ((??), EOT (EOT), mkToggle, single)
 import qualified XMonad.Layout.MultiToggle as MT (Toggle (..))
 import XMonad.Layout.MultiToggle.Instances (StdTransformers (MIRROR, NBFULL, NOBORDERS))
 import XMonad.Layout.NoBorders
-import XMonad.Layout.ResizableTile
-import XMonad.Layout.Spacing (spacingRaw, Border(Border))
+import XMonad.Layout.Renamed
+import XMonad.Layout.Spacing (Spacing, spacingRaw, Border(Border))
 import qualified XMonad.Layout.ToggleLayouts as T (ToggleLayout (Toggle), toggleLayouts)
 import XMonad.Layout.WindowArranger
 
@@ -49,22 +52,35 @@ import Control.Monad (join, when)
 import XMonad.Util.EZConfig (additionalKeysP)
 import XMonad.Util.SpawnOnce (spawnOnce)
 
-myTerminal = "alacritty" :: String
+myModMask :: KeyMask
+myModMask = mod4Mask
 
-myFocusFollowsMouse = True :: Bool
-myClickJustFocuses = False :: Bool
+myTerminal :: String
+myTerminal = "alacritty"
 
-myBorderWidth = 1 :: Dimension
+myBrowser :: String
+myBrowser = "firefox"
 
-myModMask = mod4Mask :: KeyMask
+myFocusFollowsMouse :: Bool
+myFocusFollowsMouse = True
+
+myClickJustFocuses :: Bool
+myClickJustFocuses = False
+
+myBorderWidth :: Dimension
+myBorderWidth = 2
+
+myNormalBorderColor :: String
+myNormalBorderColor = "#282828"
+
+myFocusedBorderColor :: String
+myFocusedBorderColor = "#d65d0e"
 
 myWorkspaces :: [String]
 myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 -- ["www", "dev", "term", "ref", "git", "dock", "fs", "media", "misc"]
 -- [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 
-myNormalBorderColor = "#282828" :: String
-myFocusedBorderColor = "#d65d0e" :: String
 
 addEWMHFullscreen :: X ()
 addEWMHFullscreen = do
@@ -84,11 +100,9 @@ addNETSupported x = withDisplay $ \dpy -> do
 ------------------------------------------------------------------------
 -- Key bindings:
 --
---center_control = spawn "exec ~/.config/eww/center_control"
---sidebar_control = spawn "exec ~/.config/eww/sidebar_control"
---maimcopy = spawn "maim -s | xclip -selection clipboard -t image/png && notify-send \"Screenshot\" \"Copied to Clipboard\" -i flameshot"
---maimsave = spawn "maim -s ~/Desktop/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Desktop\" -i flameshot"
-rofi_launcher = spawn "rofi -no-lazy-grab -show drun -modi run,drun,window -theme $HOME/.config/rofi/gruvbox-dark-hard -drun-icon-theme \"Papirus\" "
+maimcopy = spawn "maim -s | xclip -selection clipboard -t image/png && notify-send \"Screenshot\" \"Copied to Clipboard\" -i flameshot"
+maimsave = spawn "maim -s ~/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Desktop\" -i flameshot"
+rofi = spawn "rofi -no-lazy-grab -show drun -modi run,drun,window -theme $HOME/.config/rofi/gruvbox-dark-hard -drun-icon-theme \"Papirus\" "
 
 myKeys :: [(String, X ())]
 myKeys =
@@ -101,102 +115,72 @@ myKeys =
     , ("M-g", withFocused toggleBorder)
     
     -- Multitoggle
-    , ("M-S-<Tab>", sendMessage (MT.Toggle NBFULL) >> sendMessage ToggleStruts)
     , ("M-S-n", sendMessage $ MT.Toggle NOBORDERS)
 
     -- Launch a terminal
     , ("M-S-<Return>", spawn myTerminal)
 
+    -- Launch browser
+    , ("M-b", spawn myBrowser)
+
     -- Launch rofi and dashboard
-    , ("M-o", rofi_launcher)
-    --, ("M-p", center_control)
-    --("M-s", sidebar_control)
+    , ("M-o", rofi)
+    , ("M-p", spawn "exec $HOME/.config/eww/launch")
 
     -- Audio keys
     , ("<XF86AudioPlay>", spawn "playerctl play-pause")
     , ("<XF86AudioPrev>", spawn "playerctl previous")
     , ("<XF86AudioNext>", spawn "playerctl next")
-    , ("<XF86AudioRaiseVolume>", spawn "pactl set-sink-volume 0 +5%")
-    , ("<XF86AudioLowerVolume>", spawn "pactl set-sink-volume 0 -5%")
-    , ("<XF86AudioMute>", spawn "pactl set-sink-mute 0 toggle")
+    , ("<XF86AudioRaiseVolume>", spawn "amixer -q -D pulse set Master 5%+ unmute")
+    , ("<XF86AudioLowerVolume>", spawn "amixer -q -D pulse set Master 5%- unmute")
+    , ("<XF86AudioMute>", spawn "amixer -q -D pulse set Master toggle")
 
     -- Brightness keys
     , ("<XF86MonBrightnessUp>", spawn "brightnessctl s +10%")
     , ("<XF86MonBrightnessDown>", spawn "brightnessctl s 10-%")
  
     -- Screenshot
-    --("<Print>", maimcopy)
-    --("M-<Print>", maimsave)
+    , ("M-S-s", maimcopy)
+    , ("<Print>", maimsave)
 
-    -- Close focused window
-    , ("M-S-c", kill)
-
-    -- Gaps
-    , ("M-C-g", sendMessage $ ToggleGaps) -- toggle all gaps
-    , ("M-S-g", sendMessage $ setGaps [(L,30), (R,30), (U,30), (D,60)]) -- reset the GapSpec
-    
-    , ("M-C-t", sendMessage $ IncGap 10 L) -- increment the left-hand gap
-    , ("M-S-t", sendMessage $ DecGap 10 L) -- decrement the left-hand gap
-    
-    , ("M-C-y", sendMessage $ IncGap 10 U) -- increment the top gap
-    , ("M-C-y", sendMessage $ DecGap 10 U) -- decrement the top gap
-    
-    , ("M-C-u", sendMessage $ IncGap 10 D) -- increment the bottom gap
-    , ("M-S-u", sendMessage $ DecGap 10 D) -- decrement the bottom gap
-
-    , ("M-C-i", sendMessage $ IncGap 10 R) -- increment the right-hand gap
-    , ("M-S-i", sendMessage $ DecGap 10 R) -- decrement the right-hand gap
+    -- Close windows
+    , ("M-S-c", kill1)
+    , ("M-S-a", killAll)
 
      -- Rotate through the available layouts
     , ("M-<Space>", sendMessage NextLayout)
 
-    --  Reset the layouts on the current workspace to default
-    --((modm .|. shiftMask, xK_space ), setLayout myLayout)
-
-    -- Resize viewed windows to the correct size
-    , ("M-n", refresh)
-
-    -- Move focus to the next window
-    , ("M-<Tab>", windows W.focusDown)
-
-    -- Move focus to the next window
+    -- Move focus between windows
     , ("M-j", windows W.focusDown)
-
-    -- Move focus to the previous window
     , ("M-k", windows W.focusUp)
 
     -- Move focus to the master window
     , ("M-m", windows W.focusMaster)
 
-    -- Swap the focused window and the master window
-    , ("M-<Return>", windows W.swapMaster)
+    -- Move the focused window to the master window
+    , ("M-S-m", windows W.shiftMaster)
 
-    -- Swap the focused window with the next window
+    -- Swap the focused window
     , ("M-S-j", windows W.swapDown)
-
-    -- Swap the focused window with the previous window
     , ("M-S-k", windows W.swapUp)
 
-    -- Shrink the master area
-    , ("M-h", sendMessage MirrorShrink)
-
-    -- Expand the master area
-    , ("M-l", sendMessage MirrorExpand)
-
-    -- Toggle float window
-    --, ("M-S-t", sendMessage (T.Toggle simplestFloat))
+    -- Shrink or expand windows
+    , ("C-h", sendMessage Shrink)
+    , ("C-l", sendMessage Expand)
+    , ("C-j", sendMessage MirrorShrink)
+    , ("C-k", sendMessage MirrorExpand)
 
     -- Push window back into tiling
     , ("M-t", withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
-    , ("M-,", sendMessage (IncMasterN 1))
+    , ("M-.", sendMessage (IncMasterN 1))
 
     -- Deincrement the number of windows in the master area
-    , ("M-.", sendMessage (IncMasterN (-1)))
+    , ("M-,", sendMessage (IncMasterN (-1)))
 
     -- Restart xmonad
-    , ("M-q", spawn "xmonad --recompile; xmonad --restart")
+    , ("M-q", spawn "xmonad --recompile && xmonad --restart")
 
     ]
     ++
@@ -228,19 +212,48 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
 ------------------------------------------------------------------------
 -- Layouts:
---
-myLayout = avoidStruts
+
+-- Spacing
+mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a 
+mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
+
+-- Single window with no gaps
+mySpacing' :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a 
+mySpacing' i = spacingRaw True (Border i i i i) True (Border i i i i) True
+
+tall    = renamed [Replace "tall"]
+          $ limitWindows 10
+          $ mySpacing 6
+          $ ResizableTall 1 (3/100) (1/2) []
+
+magnif = renamed [Replace "magnif"]
+          $ magnifier
+          $ limitWindows 10
+          $ mySpacing 6
+          $ ResizableTall 1 (3/100) (1/2) []
+
+monocle = renamed [Replace "monocle"]
+          $ mySpacing 6 
+          $ limitWindows 10 
+          $ noBorders Full
+
+grid    = renamed [Replace "grid"]
+          $ limitWindows 12
+          $ mySpacing 6
+          $ Grid
+
+spirals = renamed [Replace "spirals"]
+          $ mySpacing 6
+          $ spiral (6/7)
+
+myLayoutHook = avoidStruts
     $ smartBorders
     $ mouseResize
     $ windowArrange
     $ draggingVisualizer
-    $ mkToggle (NOBORDERS ?? NBFULL ?? EOT)
-    $ tiled ||| Mirror tiled ||| Circle ||| noBorders Full
-  where
-    tiled   = ResizableTall nmaster delta ratio []
-    nmaster = 1        -- The default number of windows in the master pane
-    ratio   = 1/2      -- Default proportion of screen occupied by master pane
-    delta   = 3/100    -- Percent of screen to increment by when resizing panes
+    $ mkToggle (NOBORDERS ?? NBFULL ?? EOT) myDefaultLayout
+    where
+      myDefaultLayout = tall ||| spirals ||| magnif ||| monocle
 
 ------------------------------------------------------------------------
 -- Window rules:
@@ -262,6 +275,8 @@ myManageHook = fullscreenManageHook <+> manageDocks <+> composeAll
     , className =? "Gimp"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
+    , (className =? "firefox" <&&> resource =? "Dialog") --> doFloat
+    , (className =? "zoom" <&&> resource =? "Dialog") --> doFloat
     , isFullscreen --> doFullFloat
     ]
 
@@ -299,12 +314,10 @@ myFadeHook = composeAll [                 opaque
 -- By default, do nothing.
 myStartupHook = do
     spawnOnce "polybar --config=~/.config/polybar/config.ini main"
-    --spawnOnce "exec ~/bin/eww daemon"
     spawnOnce "feh --bg-scale ~/Pictures/Wallpapers/solo-level.png"
     spawnOnce "picom --experimental-backends"
     spawnOnce "greenclip daemon"
     spawnOnce "dunst"
-    setWMName "LG3D"
 
 ------------------------------------------------------------------------
 main :: IO ()
@@ -315,18 +328,18 @@ main = xmonad
     $ def
     {
         -- Simple stuff
+        modMask            = myModMask,
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
         clickJustFocuses   = myClickJustFocuses,
         borderWidth        = myBorderWidth,
-        modMask            = myModMask,
-        workspaces         = myWorkspaces,
         normalBorderColor  = myNormalBorderColor,
         focusedBorderColor = myFocusedBorderColor,
+        workspaces         = myWorkspaces,
 
         -- Hooks
+        layoutHook         = myLayoutHook,
         manageHook         = insertPosition Below Newer <+> myManageHook, 
-        layoutHook         = spacingRaw False (Border 6 6 6 6) True (Border 6 6 6 6) True $ myLayout,
         handleEventHook    = myEventHook,
         logHook            = myLogHook >> workspaceHistoryHook,
         startupHook        = myStartupHook >> addEWMHFullscreen
