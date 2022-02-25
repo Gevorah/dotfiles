@@ -5,8 +5,12 @@ window:
   padding:
     x: 10
     y: 10
-    dynamic_padding:  true
-    decoration: none
+  dynamic_padding: true
+
+  decoration: none
+  opacity: 1
+  dynamic_title: true
+
 
 font:
   normal:
@@ -85,13 +89,15 @@ schemes:
 
 colors: *gruvbox
 
-window_opacity: 1
-
 cursor:
-  style: Block
+  style: 
+    shape: Block
   unfocused_hollow: true
 
 live_config_reload: true
+
+mouse:
+  hide_when_typing: true
                  
 key_bindings:
   - { key: Key0, mods: Control, action: ResetFontSize }

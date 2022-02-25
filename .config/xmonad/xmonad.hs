@@ -179,8 +179,10 @@ myKeys =
     -- Deincrement the number of windows in the master area
     , ("M-,", sendMessage (IncMasterN (-1)))
 
-    -- Restart xmonad
-    , ("M-q", spawn "xmonad --recompile && xmonad --restart")
+    -- XMonad
+    , ("M-S-r", spawn "xmonad --recompile")
+    , ("M-C-r", spawn "xmonad --restart")
+    , ("M-S-q", io exitSuccess)
 
     ]
     ++
@@ -272,11 +274,10 @@ myLayoutHook = avoidStruts
 --
 myManageHook = fullscreenManageHook <+> manageDocks <+> composeAll
     [ className =? "MPlayer"        --> doFloat
-    , className =? "Gimp"           --> doFloat
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , (className =? "firefox" <&&> resource =? "Dialog") --> doFloat
-    , (className =? "zoom" <&&> resource =? "Dialog") --> doFloat
+    , (className =? "zoom" --> doFloat
     , isFullscreen --> doFullFloat
     ]
 
