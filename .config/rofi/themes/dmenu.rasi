@@ -1,0 +1,84 @@
+/******
+ * Rofi Theme
+ * Desc: Simple dmenu
+ * Author: Gevorah
+ *********/
+
+* {
+    bg:       #1d2021;
+    fg:       #ebdbb2;
+    red:      #cc241d;
+    green:    #98971a;
+    yellow:   #d79921;
+    blue:     #458588;
+    purple:   #b16286;
+    aqua:     #689d6a;
+    gray:     #a89984;
+    orange:   #d65d0e;
+
+    background-color: transparent;
+    font: "FantasqueSansMono Nerd Font 10";
+}
+
+#window {
+    location: north;
+    width: 100%;
+    height: 21px;
+    background-color: @bg;
+    children: [ mainbox, message ];
+}
+
+#mainbox {
+    orientation: horizontal;
+    children: [ inputbar, listview ];
+}
+
+#inputbar {
+    padding: 3px 6px;
+    width: 16%;
+    spacing: 9px;
+    children: [ prompt, entry ];
+}
+
+#prompt {
+    background-color: @bg;
+    text-color: @purple;
+}
+
+#entry {
+    placeholder: "Search";
+    placeholder-color: @gray;
+    text-color: @fg;
+}
+
+#listview {
+    lines: 1;
+    columns: 5;
+}
+
+#element {
+    background-color: @bg;
+    text-color: @fg;
+    padding: 3px 6px;
+    spacing: 6px;
+}
+
+#element selected {
+    background-color: @orange;
+    text-color: @fg;
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+}
+
+element-icon {
+    background-color: inherit;
+    size: 0.99em;
+}
+
+prompt, entry, element-text, element-icon {
+    vertical-align: 0.5;
+}
+/* vim:ft=css

@@ -56,7 +56,7 @@ myModMask :: KeyMask
 myModMask = mod4Mask
 
 myTerminal :: String
-myTerminal = "alacritty"
+myTerminal = "alacritty -e fish"
 
 myBrowser :: String
 myBrowser = "firefox"
@@ -81,28 +81,12 @@ myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 -- ["www", "dev", "term", "ref", "git", "dock", "fs", "media", "misc"]
 -- [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 
-
-addEWMHFullscreen :: X ()
-addEWMHFullscreen = do
-    wms <- getAtom "_NET_WM_STATE"
-    wfs <- getAtom "_NET_WM_STATE_FULLSCREEN"
-    mapM_ addNETSupported [wms, wfs]
-
-addNETSupported :: Atom -> X ()
-addNETSupported x = withDisplay $ \dpy -> do
-    r               <- asks theRoot
-    a_NET_SUPPORTED <- getAtom "_NET_SUPPORTED"
-    a               <- getAtom "ATOM"
-    liftIO $ do
-       sup <- (join . maybeToList) <$> getWindowProperty32 dpy a_NET_SUPPORTED r
-       when (fromIntegral x `notElem` sup) $
-         changeProperty32 dpy r a_NET_SUPPORTED a propModeAppend [fromIntegral x]
 ------------------------------------------------------------------------
 -- Key bindings:
 --
 maimcopy = spawn "maim -s | xclip -selection clipboard -t image/png && notify-send \"Screenshot\" \"Copied to Clipboard\" -i flameshot"
-maimsave = spawn "maim -s ~/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Desktop\" -i flameshot"
-rofi = spawn "rofi -no-lazy-grab -show drun -modi run,drun,window -theme $HOME/.config/rofi/gruvbox-dark-hard -drun-icon-theme \"Papirus\" "
+maimsave = spawn "maim ~/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Pictures\" -i flameshot"
+rofi = spawn "rofi -no-lazy-grab -show drun -config ~/.config/rofi/config.rasi"
 
 myKeys :: [(String, X ())]
 myKeys =
@@ -118,7 +102,7 @@ myKeys =
     , ("M-S-n", sendMessage $ MT.Toggle NOBORDERS)
 
     -- Launch a terminal
-    , ("M-S-<Return>", spawn myTerminal)
+    , ("M-<Return>", spawn myTerminal)
 
     -- Launch browser
     , ("M-b", spawn myBrowser)
@@ -165,13 +149,13 @@ myKeys =
     , ("M-S-k", windows W.swapUp)
 
     -- Shrink or expand windows
-    , ("C-h", sendMessage Shrink)
-    , ("C-l", sendMessage Expand)
-    , ("C-j", sendMessage MirrorShrink)
-    , ("C-k", sendMessage MirrorExpand)
+    , ("M-S-h", sendMessage Shrink)
+    , ("M-S-l", sendMessage Expand)
+    , ("C-S-j", sendMessage MirrorShrink)
+    , ("C-S-k", sendMessage MirrorExpand)
 
     -- Push window back into tiling
-    , ("M-t", withFocused $ windows . W.sink)
+    , ("M-S-<Return>", withFocused $ windows . W.sink)
 
     -- Increment the number of windows in the master area
     , ("M-.", sendMessage (IncMasterN 1))
@@ -277,7 +261,7 @@ myManageHook = fullscreenManageHook <+> manageDocks <+> composeAll
     , resource  =? "desktop_window" --> doIgnore
     , resource  =? "kdesktop"       --> doIgnore
     , (className =? "firefox" <&&> resource =? "Dialog") --> doFloat
-    , (className =? "zoom" --> doFloat
+    , className =? "zoom" --> doFloat
     , isFullscreen --> doFullFloat
     ]
 
@@ -314,11 +298,13 @@ myFadeHook = composeAll [                 opaque
 --
 -- By default, do nothing.
 myStartupHook = do
+    -- spawnOnce "lxsession"
     spawnOnce "polybar --config=~/.config/polybar/config.ini main"
     spawnOnce "feh --bg-scale ~/Pictures/Wallpapers/solo-level.png"
     spawnOnce "picom --experimental-backends"
     spawnOnce "greenclip daemon"
     spawnOnce "dunst"
+    setWMName "LG3D"
 
 ------------------------------------------------------------------------
 main :: IO ()
@@ -343,5 +329,5 @@ main = xmonad
         manageHook         = insertPosition Below Newer <+> myManageHook, 
         handleEventHook    = myEventHook,
         logHook            = myLogHook >> workspaceHistoryHook,
-        startupHook        = myStartupHook >> addEWMHFullscreen
+        startupHook        = myStartupHook
     } `additionalKeysP` myKeys
