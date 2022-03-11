@@ -40,6 +40,7 @@ import XMonad.Layout.Renamed
 import XMonad.Layout.Spacing (Spacing, spacingRaw, Border(Border))
 import qualified XMonad.Layout.ToggleLayouts as T (ToggleLayout (Toggle), toggleLayouts)
 import XMonad.Layout.WindowArranger
+import XMonad.Layout.WindowNavigation
 
 -- Data
 import Data.Monoid ()
@@ -79,7 +80,7 @@ myFocusedBorderColor = "#d65d0e"
 myWorkspaces :: [String]
 myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 -- ["www", "dev", "term", "ref", "git", "dock", "fs", "media", "misc"]
--- [" ", " ", " ", " ", " ", " ", " ", " ", " "]
+-- [" ", " ", " ", " ", " ", " ", " ", " ", " "]
 
 ------------------------------------------------------------------------
 -- Key bindings:
@@ -226,7 +227,7 @@ monocle = renamed [Replace "monocle"]
 grid    = renamed [Replace "grid"]
           $ limitWindows 12
           $ mySpacing 6
-          $ Grid
+          $ Grid (16/10)
 
 spirals = renamed [Replace "spirals"]
           $ mySpacing 6
@@ -236,10 +237,11 @@ myLayoutHook = avoidStruts
     $ smartBorders
     $ mouseResize
     $ windowArrange
+    $ windowNavigation
     $ draggingVisualizer
     $ mkToggle (NOBORDERS ?? NBFULL ?? EOT) myDefaultLayout
     where
-      myDefaultLayout = tall ||| spirals ||| magnif ||| monocle
+      myDefaultLayout = tall ||| spirals ||| magnif ||| grid ||| monocle 
 
 ------------------------------------------------------------------------
 -- Window rules:
