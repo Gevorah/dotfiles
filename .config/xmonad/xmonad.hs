@@ -57,7 +57,7 @@ myModMask :: KeyMask
 myModMask = mod4Mask
 
 myTerminal :: String
-myTerminal = "alacritty -e fish"
+myTerminal = "kitty" -- "alacritty -e fish"
 
 myBrowser :: String
 myBrowser = "firefox"
@@ -199,14 +199,9 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 
 ------------------------------------------------------------------------
 -- Layouts:
-
--- Spacing
+--
 mySpacing :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a 
 mySpacing i = spacingRaw False (Border i i i i) True (Border i i i i) True
-
--- Single window with no gaps
-mySpacing' :: Integer -> l a -> XMonad.Layout.LayoutModifier.ModifiedLayout Spacing l a 
-mySpacing' i = spacingRaw True (Border i i i i) True (Border i i i i) True
 
 tall    = renamed [Replace "tall"]
           $ limitWindows 10
@@ -245,16 +240,6 @@ myLayoutHook = avoidStruts
 
 ------------------------------------------------------------------------
 -- Window rules:
-
--- Execute arbitrary actions and WindowSet manipulations when managing
--- a new window. You can use this to, for example, always float a
--- particular program, or have a client always appear on a particular
--- workspace.
---
--- To find the property name associated with a program, use
--- > xprop | grep WM_CLASS
--- and click on the client you're interested in.
---
 -- To match on the WM_NAME, you can use 'title' in the same way that
 -- 'className' and 'resource' are used below.
 --
@@ -269,36 +254,21 @@ myManageHook = fullscreenManageHook <+> manageDocks <+> composeAll
 
 ------------------------------------------------------------------------
 -- Event handling
-
--- * EwmhDesktops users should change this to ewmhDesktopsEventHook
---
--- Defines a custom handler function for X Events. The function should
--- return (All True) if the default handler is to be run afterwards. To
--- combine event hooks use mappend or mconcat from Data.Monoid.
 --
 myEventHook = fullscreenEventHook <+> fadeWindowsEventHook
 
-
 ------------------------------------------------------------------------
 -- Status bars and logging
-
--- Perform an arbitrary action on each internal state change or X event.
--- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
 myLogHook = fadeWindowsLogHook myFadeHook
 -- myLogHook = return ()
 
 myFadeHook = composeAll [                 opaque
-                        , isUnfocused --> transparency 0.3
+                        , isUnfocused --> transparency 0.1
                         ]
 ------------------------------------------------------------------------
 -- Startup hook
-
--- Perform an arbitrary action each time xmonad starts or is restarted
--- with mod-q.  Used by, e.g., XMonad.Layout.PerWorkspace to initialize
--- per-workspace layout choices.
 --
--- By default, do nothing.
 myStartupHook = do
     -- spawnOnce "lxsession"
     spawnOnce "polybar --config=~/.config/polybar/config.ini main"
