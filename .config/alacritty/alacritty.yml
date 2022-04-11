@@ -1,5 +1,5 @@
 env:
-  TERM: alacritty
+  TERM: xterm-256color
 
 window:
   padding:
@@ -14,16 +14,16 @@ window:
 
 font:
   normal:
-    family: UbuntuMono Nerd Font
+    family: Mononoki Nerd Font
 
   bold:
-    family: UbuntuMono Nerd Font
+    family: Mononoki Nerd Font
 
   italic:
-    family: UbuntuMono Nerd Font
+    family: Mononoki Nerd Font
 
   bold_italic:
-    family: UbuntuMono Nerd Font
+    family: Mononoki Nerd Font
 
   size: 11
 
