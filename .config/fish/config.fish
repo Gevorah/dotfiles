@@ -1,5 +1,6 @@
 # EXPORT
-set -gx PATH $PATH $HOME/bin
+#set -gx PATH $PATH $HOME/bin
+set -gx PATH $PATH $HOME/.local/bin
 #set TERM "xterm-256color"
 set -gx EDITOR nvim
 
@@ -8,6 +9,9 @@ starship init fish | source
 
 
 # ALIASES
+
+# clear
+alias clear='printf \'\033[2J\033[3J\033[1;1H\''
 
 # cd nav
 alias ..='cd ..'
