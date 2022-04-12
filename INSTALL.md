@@ -131,7 +131,7 @@ pacman -S pavucontrol pulseaudio alsa-utils
 
 ## Utility
 ```sh
-sudo pacman -S nautilus dunst rofi maim xclip flameshot
+sudo pacman -S ranger dunst rofi maim xclip flameshot
 
 # picom-git next updates would include more of this fork
 yay -S polybar picom-ibhagwan-git 
@@ -140,12 +140,6 @@ yay -S polybar picom-ibhagwan-git
 ## Archiving and Compression
 ```sh
 sudo pacman -S zip unzip p7zip
-```
-
-## Optional
-verify `~/.config/polybar/user_modules.ini`
-```sh
-sudo pacman -S ranger
 ```
 
 ---------------------------------------------------------------------------------
@@ -163,7 +157,7 @@ yay -S lightdm-webkit2-theme-glorious
 [Seat:*]
 # Uncomment this line and set this value
 greeter-session = lightdm-webkit2-greeter
-'''
+```
 
 `/etc/lightdm/lightdm-webkit2-greeter.conf`
 ```sh
@@ -175,15 +169,14 @@ webkit_theme = glorious
 ---------------------------------------------------------------------------------
 # GTK Theming
 ```sh
-sudo pacman -S lxappearance gnome-tweaks
+sudo pacman -S lxappearance
 ```
 
 Directories `/usr/share/themes` and `/usr/share/icons`
 
-
 ## Fonts
 ```sh
-yay -S nerd-fonts-ubuntu-mono nerd-fantasque-sans-mono
+yay -S nerd-fonts-ubuntu-mono nerd-fonts-mononoki nerd-fonts-jetbrains-mono
 ```
 
 ## Cursor Theme: https://github.com/keeferrourke/capitaine-cursors
@@ -194,27 +187,20 @@ Edit `~/.gtkrc-2.0`
 ```sh
 gtk-cursor-theme-name = "capitaine-cursors"
 ```
-Again, edit `~/.config/gtk-3.0/settings.ini` or `~/.config/gtk-4.0/settings.ini`
+Again, edit `~/.config/gtk-3.0/settings.ini`
 ```sh
 [Settings]
 gtk-cursor-theme-name = capitaine-cursors
 ```
-
-## Icons Theme: https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
-```sh
-sudo pacman -S papirus-icon-theme
-```
-Edit `/usr/share/icons/default/index.theme`
+Finally, edit `/usr/share/icons/default/index.theme`
 ```sh
 [Icon Theme]
 Inherits = capitaine-cursors
 ```
 
-## GTK Theme: https://github.com/vinceliuice/WhiteSur-gtk-theme
+## Icons Theme: https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
 ```sh
-git clone https://github.com/vinceliuice/WhiteSur-gtk-theme
-cd WhiteSur-gtk-theme/
-sudo ./install.sh -o normal -c dark -a all -t orange -t grey -p 60 -P default -s default -i arch -b /home/gevorah/Pictures/Wallpapers/astro.png -N stable --normal --round
+sudo pacman -S papirus-icon-theme
 ```
 
 ---------------------------------------------------------------------------------
@@ -223,7 +209,7 @@ sudo ./install.sh -o normal -c dark -a all -t orange -t grey -p 60 -P default -s
 sudo pacman -S fish
 ```
 
-## Setting fish as default shell
+## (Optional) Setting fish as default shell
 ```sh
 # list installed shells
 chsh -l
@@ -243,6 +229,9 @@ Theme: https://github.com/hastinbe/theme-kawasaki
 ```sh
 omf update
 fisher update
+
+omf install sudope
+set -U fish_escape_delay_ms 300
 ```
 
 ---------------------------------------------------------------------------------
@@ -253,12 +242,17 @@ sudo pacman -S neovim
 
 ## Neovim dependences
 ```sh
-sudo pacman -Syu python python-neovim
+sudo pacman -Syu python python-pip
+pip install pynvim
 
 # NVM: https://github.com/nvm-sh/nvm#installing-and-updating
 omf install nvm
 nvm install node
 sudo pacman -S npm
+
+# edit .npmrc
+npm set prefix="$HOME/.local"
+
 sudo npm install -g neovim
 
 neovim +:checkhealth
@@ -278,8 +272,6 @@ neovim +:checkhealth
 - coc-omnisharp # csharp and visual basic server
 - coc-sql # sql server
 - coc-xml # use XML Language Server
-
-
 
 ---------------------------------------------------------------------------------
 # Git credentials
