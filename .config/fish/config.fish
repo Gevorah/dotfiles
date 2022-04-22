@@ -3,6 +3,7 @@
 set -gx PATH $PATH $HOME/.local/bin
 #set TERM "xterm-256color"
 set -gx EDITOR nvim
+set -gx RANGER_LOAD_DEFAULT_RC FALSE
 
 # PLUGINS
 starship init fish | source

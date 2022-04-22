@@ -11,19 +11,15 @@ window:
   opacity: 1
   dynamic_title: true
 
-
 font:
   normal:
-    family: Mononoki Nerd Font
-
+    family: JetBrainsMono Nerd Font
   bold:
-    family: Mononoki Nerd Font
-
+    family: JetBrainsMono Nerd Font
   italic:
-    family: Mononoki Nerd Font
-
+    family: JetBrainsMono Nerd Font
   bold_italic:
-    family: Mononoki Nerd Font
+    family: JetBrainsMono Nerd Font
 
   size: 11
 

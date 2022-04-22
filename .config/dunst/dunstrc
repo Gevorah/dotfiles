@@ -1,0 +1,52 @@
+[global]
+  follow = mouse
+  enable_posix_regex = true
+  
+  width = 300
+  height = 60
+  
+  notification_limit = 3
+  
+  origin = top-center
+  offset = 300x23
+  padding = 9
+  horizontal_padding = 9
+
+  font = Mononoki Nerd Font 9
+  
+  icon_path = /usr/share/icons/ePapirus/16x16/status/:/usr/share/icons/ePapirus/16x16/devices/
+  #icon_theme = ePapirus, Papirus
+  #enable_recursive_icon_lookup = true
+  
+  corner_radius = 13
+
+[shortcuts]
+# close = ctrl+space
+# close-all = ctrl+shift+space
+
+[urgency_low]
+  background = "#1d2021"
+  foreground = "#ebdbb2"
+  frame_color = "#282828"
+  timeout = 9
+  # icon = path/to/icon
+
+[urgency_normal]
+  background = "#1d2021"
+  foreground = "#d79921"
+  frame_color = "#282828"
+  timeout = 9
+  # icon = path/to/icon
+
+[urgency_critical]
+  background = "#1d2021"
+  foreground = "#d65d0e"
+  frame_color = "#282828"
+  timeout = 0
+  # icon = path/to/icon
+
+#[modify]
+#  icon_size = 16
+
+
+# vim: ft=cfg

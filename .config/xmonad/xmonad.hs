@@ -86,7 +86,7 @@ myWorkspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
 -- Key bindings:
 --
 maimcopy = spawn "maim -s | xclip -selection clipboard -t image/png && notify-send \"Screenshot\" \"Copied to Clipboard\" -i flameshot"
-maimsave = spawn "maim ~/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Pictures\" -i flameshot"
+maimsave = spawn "maim -s ~/Pictures/$(date +%Y-%m-%d_%H-%M-%S).png && notify-send \"Screenshot\" \"Saved to Pictures\" -i flameshot"
 rofi = spawn "rofi -no-lazy-grab -show drun -config ~/.config/rofi/config.rasi"
 
 myKeys :: [(String, X ())]
@@ -249,6 +249,8 @@ myManageHook = fullscreenManageHook <+> manageDocks <+> composeAll
     , resource  =? "kdesktop"       --> doIgnore
     , (className =? "firefox" <&&> resource =? "Dialog") --> doFloat
     , className =? "zoom" --> doFloat
+    , className =? "Spotify" --> doShift "8"
+    , className =? "Steam" --> doShift "6"
     , isFullscreen --> doFullFloat
     ]
 
@@ -264,7 +266,8 @@ myLogHook = fadeWindowsLogHook myFadeHook
 -- myLogHook = return ()
 
 myFadeHook = composeAll [                 opaque
-                        , isUnfocused --> transparency 0.1
+                        , isFloating  --> opacity 1
+                        , isUnfocused --> transparency 0.06
                         ]
 ------------------------------------------------------------------------
 -- Startup hook
