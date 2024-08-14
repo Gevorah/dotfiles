@@ -5,23 +5,28 @@
 
 ### Keyboard
 ```sh
-ls /usr/share/kbd/keymaps/**/*.map.gz
-loadkeys es
+localectl list-keymaps
+loadkeys en
 ```
 
-### Make partitions 
-Verify the disk 'lsblk'
-Make linux swap (4G), root (30G), home (60G), efi (550M)
+### System clock
 ```sh
-cfdisk /dev/<disk>
+timedatectl set-timezone America/Bogota
+```
+
+### Make partitions
+Make linux efi (1G), swap (4G), root (30G) and home
+```sh
+fdisk -l
+fdisk /dev/<disk>
 ```
 
 ### Format partitions
 ```sh
-mkfs.fat -F32 /dev/<boot>
+mkfs.fat -F32 /dev/<efi>
+mkswap /dev/<swap>
 mkfs.ext4 /dev/<root>
 mkfs.ext4 /dev/<home>
-mkswap /dev/<swap>
 ```
 
 ### Mount partitions
@@ -35,50 +40,47 @@ mount /dev/<home> /mnt/home
 ```
 
 ## Installation
-pacstrap /mnt base linux linux-firmware nano # intel or amd ucode
-
-## Configure
-fstab
 ```sh
-genfstab -U /mnt >> /mnt/etc/fstab
-cat /mnt/etc/fstab # to check
+reflector -c "Colombia" -l 3 -p https --sort rate --save /etc/pacman.d/mirrorlist
+pacstrap /mnt base linux linux-firmware vim # intel-ucode or amd-ucode
 ```
 
-### chroot
+## Configure
+### Generate fstab
+```sh
+genfstab -U /mnt >> /mnt/etc/fstab
+```
+
+### Change root
 ```sh
 arch-chroot /mnt
 ```
 
-### time zone
+### Time zone
 ```sh
-ln -sf /usr/share/zoneinfo/Region/City /etc/localtime
+ln -sf /usr/share/zoneinfo/America/Bogota /etc/localtime
 ```
 
-### locales
+### Localization
 ```sh
-# uncomment en_US.UTF-8 UTF-8
-nano /etc/locale.gen 
+vim /etc/locale.gen # uncomment en_US.UTF-8 UTF-8
 locale-gen
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "KEYMAP=en" > /etc/vconsole.conf
 ```
 
-### network
+### Network
 ```sh
 echo "<hostname>" > /etc/hostname
 echo "127.0.0.1    localhost" >> /etc/hosts
 echo "::1          localhost" >> /etc/hosts
 echo "127.0.0.1    <hostname>.localdomain    <hostname>" >> /etc/hosts
 
-pacman -S netctl dialog dhcpcd elinks ifplugd # laptop: wpa_supplicant iw
-systemctl enable dhcpcd
+pacman -S inetutils netctl networkmanager ifplugd dialog # wireless: wpa_supplicant iw
+systemctl enable NetworkManager.service
 ```
 
-### Root password
-```sh
-passwd
-```
-
-### grub
+### Grub
 ```sh
 pacman -S grub efibootmgr os-prober
 grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
@@ -86,18 +88,23 @@ grub-mkconfig -o /boot/grub/grub.cfg
 echo "OS_PROBER_DISABLE=false" >> /etc/default/grub
 ```
 
-### user
+### Root password
+```sh
+passwd
+```
+
+### User
 ```sh
 useradd -m <username>
 passwd <username>
-usermod -aG wheel,video,audio,storage <username>
+usermod -aG wheel,audio,video,storage <username>
 ```
 sudo privileges
 ```sh
 pacman -S sudo
 
 # Uncomment '%wheel ALL=(ALL) ALL' to allow members of group wheel to execute any command 
-nano /etc/sudoers
+vim /etc/sudoers
 ```
 
 ### Reboot
@@ -109,7 +116,7 @@ reboot
 ---------------------------------------------------------------------------------
 # AUR helper
 ```sh
-sudo pacman -Syu base-devel git curl
+sudo pacman -Syu base-devel git curl wget
 cd /opt/
 sudo git clone https://aur.archlinux.org/yay-git.git
 sudo chown -R username:users ./yay-git
@@ -120,16 +127,32 @@ makepkg -si
 ---------------------------------------------------------------------------------
 # Desktop Environment
 ```sh
-sudo pacman -Syu xorg xorg-server xorg-xinit lightdm lightdm-webkit2-greeter networkmanager nm-connection-editor network-manager-applet alacritty 
+sudo pacman -Syu xorg-server xorg-xinit xorg-xrandr xorg-xfontsel xorg-xlsfonts xorg-xkill xorg-xinput xorg-xwininfo
+```
+
+## Gnome
+```sh
+sudo pacman -S gnome gdm # gnome-extra
+systemctl enable gdm.service
+```
+
+## LightDM
+```sh
+sudo pacman -S lightdm lightdm-webkit2-greeter nm-connection-editor network-manager-applet alacritty 
 systemctl enable lightdm
 ```
 
-## Sound
+# Graphics driver
 ```sh
-pacman -S pavucontrol pulseaudio alsa-utils
+sudo pacman -S mesa
 ```
 
-## Utility
+# Sound
+```sh
+pacman -S alsa-utils pipewire pipewire-pulse pipewire-jack wireplumber
+```
+
+# Utility
 ```sh
 sudo pacman -S ranger dunst rofi maim xclip flameshot
 
@@ -137,9 +160,15 @@ sudo pacman -S ranger dunst rofi maim xclip flameshot
 yay -S polybar picom-ibhagwan-git 
 ```
 
-## Archiving and Compression
+# Archives
 ```sh
-sudo pacman -S zip unzip p7zip
+sudo pacman -S p7zip zip unzip unarchiver rsync
+```
+
+# Bluetooth
+```sh
+sudo pacman -S bluez bluez-utils
+systemctl enable bluetooth
 ```
 
 ---------------------------------------------------------------------------------
@@ -201,37 +230,6 @@ Inherits = capitaine-cursors
 ## Icons Theme: https://github.com/PapirusDevelopmentTeam/papirus-icon-theme
 ```sh
 sudo pacman -S papirus-icon-theme
-```
-
----------------------------------------------------------------------------------
-# Fish
-```sh
-sudo pacman -S fish
-```
-
-## (Optional) Setting fish as default shell
-```sh
-# list installed shells
-chsh -l
-
-# set fish as default for your user
-chsh -s /path/to/fish
-
-# disabele fish greeting message at startup
-set -U fish_greeting
-```
-
-## Plugins
-OMF: https://github.com/oh-my-fish/oh-my-fish
-Fisher: https://github.com/jorgebucaran/fisher
-Theme: https://github.com/hastinbe/theme-kawasaki
-
-```sh
-omf update
-fisher update
-
-omf install sudope
-set -U fish_escape_delay_ms 300
 ```
 
 ---------------------------------------------------------------------------------
