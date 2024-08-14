@@ -117,10 +117,8 @@ reboot
 # AUR helper
 ```sh
 sudo pacman -Syu base-devel git curl wget
-cd /opt/
-sudo git clone https://aur.archlinux.org/yay-git.git
-sudo chown -R username:users ./yay-git
-cd yay-git/
+git clone https://aur.archlinux.org/yay.git
+cd yay
 makepkg -si
 ```
 
